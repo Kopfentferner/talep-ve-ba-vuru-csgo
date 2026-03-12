@@ -1,4 +1,4 @@
-const { 
+const {
 Client,
 GatewayIntentBits,
 ActionRowBuilder,
@@ -26,16 +26,17 @@ GatewayIntentBits.MessageContent,
 GatewayIntentBits.GuildMembers
 ]});
 
+const destekKategori = "1466029294097530942";
+const basvuruKategori = "1253348803487076454";
+const logKanal = "1466030876709359680";
+
 const yetkiliRoller = [
 "1466542588185149655",
 "1253285883826929810"
 ];
 
-const destekKategori = "1466029294097530942";
-const basvuruKategori = "1253348803487076454";
-
 let sayac = {
-onerı:0,
+oneri:0,
 soru:0,
 ban:0,
 admin:0,
@@ -46,35 +47,111 @@ client.once("ready",()=>{
 console.log(`${client.user.tag} aktif`);
 });
 
+client.on("messageCreate", async message => {
+
+if(message.author.bot) return;
+
+/* DESTEK PANEL */
+
+if(message.content === "!paneldestek"){
+
+const embed = new EmbedBuilder()
+.setTitle("🎫 Destek Sistemi")
+.setDescription("Lütfen ihtiyacınıza yönelik butonu kullanarak talep oluşturun.")
+.setColor("Blue");
+
+const row = new ActionRowBuilder().addComponents(
+
+new ButtonBuilder()
+.setCustomId("oneri")
+.setLabel("Öneri")
+.setStyle(ButtonStyle.Success),
+
+new ButtonBuilder()
+.setCustomId("soru")
+.setLabel("Soru")
+.setStyle(ButtonStyle.Primary),
+
+new ButtonBuilder()
+.setCustomId("ban")
+.setLabel("Ban İtiraz")
+.setStyle(ButtonStyle.Danger)
+
+);
+
+message.channel.send({
+embeds:[embed],
+components:[row]
+});
+
+}
+
+/* BAŞVURU PANEL */
+
+if(message.content === "!panelbasvuru"){
+
+const embed = new EmbedBuilder()
+.setTitle("📋 Başvuru Paneli")
+.setDescription("🛡 Admin Başvuru → Ücretli ve Ücretsiz Yetki için\n💎 VIP Başvuru → Ücretsiz ve Ücretli VIP için")
+.setColor("Purple");
+
+const row = new ActionRowBuilder().addComponents(
+
+new ButtonBuilder()
+.setCustomId("admin")
+.setLabel("Admin Başvuru")
+.setStyle(ButtonStyle.Success),
+
+new ButtonBuilder()
+.setCustomId("vip")
+.setLabel("VIP Başvuru")
+.setStyle(ButtonStyle.Primary)
+
+);
+
+message.channel.send({
+embeds:[embed],
+components:[row]
+});
+
+}
+
+});
+
+/* BUTTON VE MODAL */
+
 client.on("interactionCreate", async interaction => {
 
 if(interaction.isButton()){
+
+/* ÖNERİ */
 
 if(interaction.customId === "oneri"){
 
 const modal = new ModalBuilder()
 .setCustomId("oneriModal")
-.setTitle("Öneri Yaz");
+.setTitle("Öneri");
 
 const input = new TextInputBuilder()
 .setCustomId("oneriText")
 .setLabel("Önerinizi yazınız")
-.setStyle(TextInputStyle.Paragraph)
-.setRequired(true);
+.setStyle(TextInputStyle.Paragraph);
 
 modal.addComponents(
 new ActionRowBuilder().addComponents(input)
 );
 
-await interaction.showModal(modal);
+interaction.showModal(modal);
 
 }
+
+/* SORU */
 
 if(interaction.customId === "soru"){
 
 const modal = new ModalBuilder()
 .setCustomId("soruModal")
-.setTitle("Soru Sor");
+.setTitle("Soru");
 
 const input = new TextInputBuilder()
 .setCustomId("soruText")
@@ -85,9 +162,11 @@ modal.addComponents(
 new ActionRowBuilder().addComponents(input)
 );
 
-await interaction.showModal(modal);
+interaction.showModal(modal);
 
 }
+
+/* BAN İTİRAZ */
 
 if(interaction.customId === "ban"){
 
@@ -95,24 +174,29 @@ const modal = new ModalBuilder()
 .setCustomId("banModal")
 .setTitle("Ban İtiraz");
 
-const steam = new TextInputBuilder()
-.setCustomId("steam")
-.setLabel("Steam Profil Link")
-.setStyle(TextInputStyle.Short);
+modal.addComponents(
 
-const neden = new TextInputBuilder()
+new ActionRowBuilder().addComponents(
+new TextInputBuilder()
+.setCustomId("steam")
+.setLabel("Steam profil link")
+.setStyle(TextInputStyle.Short)
+),
+
+new ActionRowBuilder().addComponents(
+new TextInputBuilder()
 .setCustomId("neden")
 .setLabel("Neden itiraz ediyorsunuz")
-.setStyle(TextInputStyle.Paragraph);
+.setStyle(TextInputStyle.Paragraph)
+)
 
-modal.addComponents(
-new ActionRowBuilder().addComponents(steam),
-new ActionRowBuilder().addComponents(neden)
 );
 
-await interaction.showModal(modal);
+interaction.showModal(modal);
 
 }
+
+/* ADMIN BAŞVURU */
 
 if(interaction.customId === "admin"){
 
@@ -121,29 +205,35 @@ const modal = new ModalBuilder()
 .setTitle("Admin Başvuru");
 
 modal.addComponents(
+
 new ActionRowBuilder().addComponents(
 new TextInputBuilder()
 .setCustomId("steam")
-.setLabel("Steam profil linki")
+.setLabel("Steam profil link")
 .setStyle(TextInputStyle.Short)
 ),
+
 new ActionRowBuilder().addComponents(
 new TextInputBuilder()
 .setCustomId("sure")
-.setLabel("SW deki süreniz (!sürem)")
+.setLabel("SW deki süreniz")
 .setStyle(TextInputStyle.Short)
 ),
+
 new ActionRowBuilder().addComponents(
 new TextInputBuilder()
 .setCustomId("tw")
 .setLabel("TW bakmayı biliyor musun?")
 .setStyle(TextInputStyle.Short)
 )
+
 );
 
-await interaction.showModal(modal);
+interaction.showModal(modal);
 
 }
+
+/* VIP BAŞVURU */
 
 if(interaction.customId === "vip"){
 
@@ -152,37 +242,71 @@ const modal = new ModalBuilder()
 .setTitle("VIP Başvuru");
 
 modal.addComponents(
+
 new ActionRowBuilder().addComponents(
 new TextInputBuilder()
 .setCustomId("steam")
-.setLabel("Steam profil linki")
+.setLabel("Steam profil link")
 .setStyle(TextInputStyle.Short)
 ),
+
 new ActionRowBuilder().addComponents(
 new TextInputBuilder()
 .setCustomId("sure")
 .setLabel("SW deki süreniz")
 .setStyle(TextInputStyle.Short)
 )
+
 );
 
-await interaction.showModal(modal);
+interaction.showModal(modal);
+
+}
+
+/* TICKET KAPAT */
+
+if(interaction.customId === "kapat"){
+
+const channel = interaction.channel;
+
+const messages = await channel.messages.fetch({limit:100});
+
+let text = "";
+
+messages.reverse().forEach(m=>{
+text += `${m.author.tag}: ${m.content}\n`;
+});
+
+const buffer = Buffer.from(text,"utf8");
+
+const log = await client.channels.fetch(logKanal);
+
+log.send({
+content:`Ticket kapatıldı\nKapatan Yetkili: ${interaction.user}`,
+files:[{attachment:buffer,name:"ticket.txt"}]
+});
+
+interaction.reply({content:"Ticket kapatılıyor...",ephemeral:true});
+
+setTimeout(()=>{
+channel.delete();
+},3000);
 
 }
 
 }
+
+/* MODAL SUBMIT */
 
 if(interaction.isModalSubmit()){
-
-const guild = interaction.guild;
 
 let kategori;
 let isim;
 
 if(interaction.customId === "oneriModal"){
-sayac.onerı++;
+sayac.oneri++;
 kategori = destekKategori;
-isim = `öneri-${sayac.onerı}`;
+isim = `öneri-${sayac.oneri}`;
 }
 
 if(interaction.customId === "soruModal"){
@@ -209,13 +333,13 @@ kategori = basvuruKategori;
 isim = `vipbasvuru-${sayac.vip}`;
 }
 
-const channel = await guild.channels.create({
+const channel = await interaction.guild.channels.create({
 name:isim,
 type:ChannelType.GuildText,
 parent:kategori,
 permissionOverwrites:[
 {
-id:guild.id,
+id:interaction.guild.id,
 deny:[PermissionsBitField.Flags.ViewChannel]
 },
 {
@@ -229,9 +353,19 @@ allow:[PermissionsBitField.Flags.ViewChannel]
 ]
 });
 
-await channel.send(`Talep sahibi: ${interaction.user}`);
+const closeButton = new ActionRowBuilder().addComponents(
+new ButtonBuilder()
+.setCustomId("kapat")
+.setLabel("Ticket Kapat")
+.setStyle(ButtonStyle.Danger)
+);
 
-await interaction.reply({
+channel.send({
+content:`Talep sahibi: ${interaction.user}`,
+components:[closeButton]
+});
+
+interaction.reply({
 content:`Talebiniz oluşturuldu: ${channel}`,
 ephemeral:true
 });
